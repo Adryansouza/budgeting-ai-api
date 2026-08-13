@@ -1,0 +1,76 @@
+Principais formas de manipular a forma que a IA responde etc: 
+
+spring.ai.ollama.chat.model=qwen2.5:1.5b
+
+Escolhe o modelo.
+
+spring.ai.ollama.chat.temperature=0.2
+
+Criatividade.
+Valores:
+0.0 -> extremamente direto
+0.2 -> bom para financeiro
+0.5 -> equilibrado
+0.8 -> criativo
+1.0+ -> mais imprevisível
+
+
+spring.ai.ollama.chat.num-predict=120
+Tamanho máximo da resposta.
+Valores:
+50  -> respostas curtas
+120 -> bom para API simples
+300 -> explicações maiores
+800 -> respostas longas
+
+
+spring.ai.ollama.chat.top-p=0.8
+Controla variedade das palavras.
+Valores:
+0.5 -> mais conservador
+0.8 -> equilibrado
+0.9 -> mais variado
+1.0 -> bem aberto
+
+
+
+spring.ai.ollama.chat.top-k=40
+Limita quantas opções de palavra o modelo considera.
+Valores:
+10 -> mais previsível
+40 -> padrão comum
+80 -> mais variado
+
+
+Para Velocidade
+spring.ai.ollama.chat.num-ctx=2048
+Tamanho da memória de contexto.
+Valores:
+1024 -> mais leve
+2048 -> padrão bom
+4096 -> mais contexto, mais pesado
+
+
+spring.ai.ollama.chat.keep_alive=5m
+Quanto tempo o modelo fica carregado depois da resposta.
+Valores:
+30s -> libera memória rápido
+5m  -> bom para desenvolvimento
+30m -> bom se você testar muito seguido
+
+
+Para Repetição
+spring.ai.ollama.chat.repeat-penalty=1.1
+Evita repetição.
+Valores:
+1.0 -> sem penalidade
+1.1 -> padrão bom
+1.3 -> evita mais repetição
+
+
+Para Modelos Com Thinking
+spring.ai.ollama.chat.think=false
+Desliga raciocínio interno quando o modelo suporta isso.
+Use:
+false -> mais rápido
+true  -> mais lento, pode raciocinar melhor
