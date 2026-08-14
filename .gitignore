@@ -1,7 +1,10 @@
 HELP.md
 target/
 .maven-home/
+.venv/
 .mvn/wrapper/maven-wrapper.jar
+*.class
+application.properties
 src/main/resources/application.properties
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -35,7 +38,7 @@ dicas.txt
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
