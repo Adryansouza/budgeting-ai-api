@@ -10,8 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class SpeechService {
 
-    private static final String SPEECH_SCRIPT = "scripts/speak.py";
-    private static final String PYTHON_EXECUTABLE = ".venv/Scripts/python.exe";
+    private final String speechScript;
+    private final String pythonExecutable;
+
+    public SpeechService(
+            @org.springframework.beans.factory.annotation.Value("${app.audio.python-executable:.venv/Scripts/python.exe}") String pythonExecutable,
+            @org.springframework.beans.factory.annotation.Value("${app.audio.speech-script:scripts/speak.py}") String speechScript) {
+        this.pythonExecutable = pythonExecutable;
+        this.speechScript = speechScript;
+    }
 
     public byte[] generateAudio(String text) {
         if (text == null || text.isBlank()) {
@@ -36,20 +43,20 @@ public class SpeechService {
     }
 
     private void runSpeechScript(String text, Path outputAudioFile) throws IOException, InterruptedException {
-        Path pythonExecutable = Path.of(PYTHON_EXECUTABLE).toAbsolutePath();
-        Path speechScript = Path.of(SPEECH_SCRIPT).toAbsolutePath();
+        Path pythonExecutablePath = Path.of(pythonExecutable).toAbsolutePath();
+        Path speechScriptPath = Path.of(speechScript).toAbsolutePath();
 
-        if (!Files.exists(pythonExecutable)) {
-            throw new IOException("Python nao encontrado em: " + pythonExecutable);
+        if (!Files.exists(pythonExecutablePath)) {
+            throw new IOException("Python nao encontrado em: " + pythonExecutablePath);
         }
 
-        if (!Files.exists(speechScript)) {
-            throw new IOException("Script de sintese de voz nao encontrado em: " + speechScript);
+        if (!Files.exists(speechScriptPath)) {
+            throw new IOException("Script de sintese de voz nao encontrado em: " + speechScriptPath);
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder(
-                pythonExecutable.toString(),
-                speechScript.toString(),
+                pythonExecutablePath.toString(),
+                speechScriptPath.toString(),
                 text,
                 outputAudioFile.toAbsolutePath().toString());
 

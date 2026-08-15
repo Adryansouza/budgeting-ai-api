@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.projeto.budgeting.dto.AudioMessageResponse;
+import com.projeto.budgeting.dto.TranscriptionResponse;
 import com.projeto.budgeting.services.TranscriptionService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,8 @@ public class TranscriptionController {
     private final TranscriptionService transcriptionService;
 
     @PostMapping("/transcriptions")
-    public AudioMessageResponse audioMessage(@RequestParam("audioMessage") MultipartFile audioMessage) {
-        return transcriptionService.receiveAudio(audioMessage);
+    public TranscriptionResponse audioMessage(@RequestParam("audioMessage") MultipartFile audioMessage) {
+        return new TranscriptionResponse(transcriptionService.transcribe(audioMessage));
     }
 
 }

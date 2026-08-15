@@ -8,40 +8,34 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.projeto.budgeting.dto.AudioMessageResponse;
-import com.projeto.budgeting.dto.ChatResponse;
-
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class TranscriptionService {
 
-    private static final String TRANSCRIPTION_SCRIPT = "scripts/transcribe.py";
-    private static final String PYTHON_EXECUTABLE = ".venv/Scripts/python.exe";
+    private final String transcriptionScript;
+    private final String pythonExecutable;
 
-    private final ChatService chatService;
+    public TranscriptionService(
+            @org.springframework.beans.factory.annotation.Value("${app.audio.python-executable:.venv/Scripts/python.exe}") String pythonExecutable,
+            @org.springframework.beans.factory.annotation.Value("${app.audio.transcription-script:scripts/transcribe.py}") String transcriptionScript) {
+        this.pythonExecutable = pythonExecutable;
+        this.transcriptionScript = transcriptionScript;
+    }
 
-    public AudioMessageResponse receiveAudio(MultipartFile audioMessage) {
+    public String transcribe(MultipartFile audioMessage) {
         if (audioMessage == null || audioMessage.isEmpty()) {
-            return new AudioMessageResponse(null, "Nenhum audio foi enviado.");
+            throw new IllegalArgumentException("Nenhum audio foi enviado.");
         }
 
         Path temporaryAudioFile = null;
 
         try {
             temporaryAudioFile = saveTemporaryAudioFile(audioMessage);
-            String transcription = transcribeAudio(temporaryAudioFile);
-            ChatResponse chatResponse = chatService.chamarChatClient(transcription);
-
-            return new AudioMessageResponse(transcription, chatResponse.getMessage());
+            return transcribeAudio(temporaryAudioFile);
         } catch (IOException exception) {
-            return new AudioMessageResponse(null, "Nao foi possivel processar o audio: " + exception.getMessage());
+            throw new IllegalStateException("Nao foi possivel processar o audio: " + exception.getMessage(), exception);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
-            return new AudioMessageResponse(null, "A transcricao foi interrompida.");
-        } catch (RuntimeException exception) {
-            return new AudioMessageResponse(null, "Erro inesperado ao transcrever o audio: " + exception.getMessage());
+            throw new IllegalStateException("A transcricao foi interrompida.", exception);
         } finally {
             deleteTemporaryAudioFile(temporaryAudioFile);
         }
@@ -58,20 +52,20 @@ public class TranscriptionService {
     }
 
     private String transcribeAudio(Path audioFile) throws IOException, InterruptedException {
-        Path pythonExecutable = Path.of(PYTHON_EXECUTABLE).toAbsolutePath();
-        Path transcriptionScript = Path.of(TRANSCRIPTION_SCRIPT).toAbsolutePath();
+        Path pythonExecutablePath = Path.of(pythonExecutable).toAbsolutePath();
+        Path transcriptionScriptPath = Path.of(transcriptionScript).toAbsolutePath();
 
-        if (!Files.exists(pythonExecutable)) {
-            throw new IOException("Python nao encontrado em: " + pythonExecutable);
+        if (!Files.exists(pythonExecutablePath)) {
+            throw new IOException("Python nao encontrado em: " + pythonExecutablePath);
         }
 
-        if (!Files.exists(transcriptionScript)) {
-            throw new IOException("Script de transcricao nao encontrado em: " + transcriptionScript);
+        if (!Files.exists(transcriptionScriptPath)) {
+            throw new IOException("Script de transcricao nao encontrado em: " + transcriptionScriptPath);
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder(
-                pythonExecutable.toString(),
-                transcriptionScript.toString(),
+                pythonExecutablePath.toString(),
+                transcriptionScriptPath.toString(),
                 audioFile.toAbsolutePath().toString());
 
         processBuilder.redirectErrorStream(true);

@@ -11,6 +11,7 @@ import com.projeto.budgeting.dto.SpeechRequest;
 import com.projeto.budgeting.services.SpeechService;
 
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class SpeechController {
     private final SpeechService speechService;
 
     @PostMapping("/speech")
-    public ResponseEntity<byte[]> generateSpeech(@RequestBody SpeechRequest speechRequest) {
+    public ResponseEntity<byte[]> generateSpeech(@Valid @RequestBody SpeechRequest speechRequest) {
         byte[] audio = speechService.generateAudio(speechRequest.getText());
 
         return ResponseEntity.ok()

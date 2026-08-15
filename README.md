@@ -1,12 +1,19 @@
-# API Inteligente de Controle Financeiro com Spring Boot e Spring AI
+# 💰 Budgeting AI API
 
-## Descricao do Projeto
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-brightgreen)
+![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0-green)
+![MySQL](https://img.shields.io/badge/MySQL-Database-blue)
+![Python](https://img.shields.io/badge/Python-Audio-yellow)
+![Projeto educacional](https://img.shields.io/badge/projeto-educacional-lightgrey)
 
-Este projeto foi desenvolvido como parte do desafio de projeto da trilha de Spring Boot com Inteligencia Artificial da Digital Innovation One (DIO) em parceria com o Santander.
+## 📖 Descrição do projeto
 
-A proposta do desafio é criar uma API de orcamento inteligente utilizando Spring Boot, Spring AI e recursos de audio. A aplicacao permite que uma pessoa usuaria registre e consulte transacoes financeiras por meio de comandos em linguagem natural, conectando uma inteligencia artificial a funcoes reais do sistema.
+API inteligente de controle financeiro desenvolvida com **Java, Spring Boot e Spring AI**, como parte do desafio de projeto da **Digital Innovation One (DIO)**, no programa realizado em parceria com o **Santander**.
 
-Na pratica, a API consegue receber mensagens por texto ou audio, interpretar a intencao da pessoa usuaria, executar operacoes financeiras e salvar os dados em um banco MySQL hospedado no Railway.
+A aplicação permite registrar e consultar despesas usando comandos em linguagem natural enviados por texto ou áudio. A inteligência artificial interpreta a solicitação, executa operações reais por meio de **Tool Calling** e armazena as transações em um banco de dados MySQL.
+
+Na prática, a API conecta recursos de IA a funções reais da aplicação, preservando a separação de responsabilidades entre controllers, serviços, ferramentas financeiras e persistência.
 
 Exemplo de uso:
 
@@ -16,7 +23,7 @@ Gastei 25 reais hoje no mercado, adiciona nas despesas pra mim.
 
 A aplicacao interpreta o comando, identifica que se trata de uma despesa, infere a categoria `alimentacao` e registra a transacao no banco de dados.
 
-## Objetivo do Desafio
+## 🎯 Sobre o desafio
 
 O objetivo principal e demonstrar como integrar recursos de Inteligencia Artificial a uma aplicacao Java real, mantendo uma arquitetura organizada e pronta para evolucao.
 
@@ -30,7 +37,7 @@ O fluxo principal da API e:
 6. Criar ou consultar transacoes financeiras.
 7. Retornar uma resposta final para a pessoa usuaria.
 
-## Minha Evolucao no Projeto
+## 🚀 Minha evolução no projeto
 
 Alem da base proposta no desafio, implementei melhorias para deixar a API mais completa e mais proxima de um uso real.
 
@@ -48,7 +55,9 @@ Principais evolucoes:
 - Endpoints REST para texto, transcricao de audio, geracao de audio e fluxo completo de audio com IA.
 - Uso de scripts Python para transcricao e geracao de fala.
 
-## Tecnologias Utilizadas
+> O Spring AI e usado no ChatClient e no Tool Calling. Nesta versao, a transcricao e a sintese de voz sao feitas por integracoes Python com Faster Whisper e Edge TTS, como uma evolucao propria do projeto base.
+
+## 🛠️ Tecnologias utilizadas
 
 - Java 21
 - Spring Boot
@@ -64,7 +73,7 @@ Principais evolucoes:
 - Faster Whisper
 - Insomnia para testes de API
 
-## Arquitetura do Projeto
+## 🏗️ Arquitetura do projeto
 
 A aplicacao foi organizada em camadas para separar responsabilidades:
 
@@ -79,7 +88,7 @@ resources   -> contem configuracoes e prompt do assistente financeiro
 scripts     -> contem scripts auxiliares de audio e banco de dados
 ```
 
-## Estrutura do Banco de Dados
+## 🗄️ Estrutura do banco de dados
 
 O banco foi estruturado com nomes em portugues para facilitar o entendimento do projeto.
 
@@ -116,7 +125,7 @@ scripts/DATABASE.sql
 | `data_ocorrencia` | Data em que a transacao aconteceu |
 | `data_criacao` | Data em que o registro foi criado no sistema |
 
-## Endpoints da API
+## 🔌 Endpoints da API
 
 ### 1. Conversa por Texto
 
@@ -166,10 +175,11 @@ Exemplo de resposta:
 
 ```json
 {
-  "transcription": "gastei 25 reais no mercado",
-  "message": "gastei 25 reais no mercado"
+  "text": "gastei 25 reais no mercado"
 }
 ```
+
+Este endpoint apenas transcreve o arquivo. Ele nao envia a mensagem para a IA nem altera o banco de dados.
 
 ### 3. Geracao de Audio
 
@@ -226,7 +236,7 @@ X-Transcription
 X-Assistant-Message
 ```
 
-## Exemplos de Comandos Aceitos
+## 💬 Exemplos de comandos aceitos
 
 Registro de despesa:
 
@@ -247,13 +257,13 @@ Soma lazer com alimentacao este mes.
 Quanto gastei entre 2026-08-01 e 2026-08-31?
 ```
 
-## Como Executar o Projeto
+## ▶️ Como executar o projeto
 
 ### 1. Clonar o repositorio
 
 ```bash
-git clone <url-do-repositorio>
-cd ProjetoIA
+git clone https://github.com/Adryansouza/budgeting-ai-api.git
+cd budgeting-ai-api
 ```
 
 ### 2. Configurar o banco de dados
@@ -273,6 +283,8 @@ O arquivo de exemplo da aplicacao fica em:
 ```text
 src/main/resources/application-example.properties
 ```
+
+Copie esse arquivo como `src/main/resources/application.properties`. O arquivo real fica fora do Git para evitar o vazamento de credenciais.
 
 ### 3. Criar a tabela no Railway
 
@@ -313,7 +325,32 @@ Comando para baixar o modelo:
 ollama pull qwen2.5:1.5b
 ```
 
-### 5. Executar a aplicacao
+Mantenha o Ollama em execucao enquanto estiver usando os endpoints `/chat` e `/audio-chat`.
+
+### 5. Preparar o ambiente Python
+
+O Python e usado na transcricao e na geracao de voz.
+
+No Windows (PowerShell):
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+Em Linux ou macOS:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+export PYTHON_EXECUTABLE=.venv/bin/python
+```
+
+Na primeira transcricao, o Faster Whisper baixa o modelo `small`. A geracao de voz com Edge TTS precisa de conexao com a internet.
+
+### 6. Executar a aplicacao
 
 No Windows:
 
@@ -333,7 +370,7 @@ A API ficara disponivel em:
 http://localhost:8080
 ```
 
-## Como Testar no Insomnia
+## 🧪 Como testar no Insomnia
 
 ### Teste de registro por texto
 
@@ -405,7 +442,33 @@ Body JSON:
 }
 ```
 
-## Aprendizados
+### Teste do fluxo completo por audio
+
+Crie uma requisicao `POST` para:
+
+```text
+http://localhost:8080/audio-chat
+```
+
+Use `multipart/form-data`, com o arquivo no campo `audioMessage`. A resposta sera um MP3 e os headers `X-Transcription` e `X-Assistant-Message` mostrarao a transcricao e a resposta da IA.
+
+### Testes automatizados
+
+No Windows:
+
+```powershell
+mvnw.cmd test
+```
+
+Em Linux ou macOS:
+
+```bash
+./mvnw test
+```
+
+Os testes automatizados cobrem o carregamento da aplicacao, a normalizacao das transacoes, consultas por periodo e validacoes das ferramentas financeiras. O teste de integracao com Ollama e opcional e pode ser habilitado com `OLLAMA_ENABLED=true`.
+
+## 🎓 Aprendizados
 
 Durante o desenvolvimento deste projeto, pratiquei conceitos importantes de desenvolvimento backend com Java e Spring Boot.
 
@@ -421,8 +484,24 @@ Os principais aprendizados foram:
 - Como organizar responsabilidades entre controller, service, repository, model e DTO.
 - Como documentar uma API para facilitar testes e avaliacao.
 
-## Conclusao
+## ✅ Conclusão
 
 Este projeto demonstra uma aplicacao pratica de Inteligencia Artificial integrada a uma API Java. Mais do que apenas conversar com um modelo, a aplicacao executa acoes reais, registra dados financeiros, consulta informacoes persistidas e permite interacao por texto e audio.
 
 A evolucao implementada mostra como uma API simples pode se tornar um assistente financeiro inteligente, mantendo uma base organizada para futuras melhorias, como autenticacao, controle por usuario, dashboards, metas financeiras e categorias personalizadas.
+
+## 📚 Créditos
+
+Projeto desenvolvido como parte do desafio da **Digital Innovation One (DIO)**, no programa realizado em parceria com o **Santander**.
+
+O projeto foi baseado nos conteúdos apresentados na trilha de Spring Boot e evoluído com implementações próprias relacionadas a consultas financeiras, persistência, validações, processamento de áudio e testes automatizados.
+
+- [Digital Innovation One](https://www.dio.me/)
+- [Repositório da trilha Spring Boot](https://github.com/digitalinnovationone/dio-spring-boot-learning-track)
+- [Projeto de referência com Spring AI](https://github.com/digitalinnovationone/dio-spring-boot-learning-track/tree/main/05-spring-ai)
+
+## 👨‍💻 Autor
+
+Desenvolvido por **Adryan Albuquerque**.
+
+- [GitHub — Adryansouza](https://github.com/Adryansouza)

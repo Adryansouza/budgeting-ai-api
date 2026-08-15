@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projeto.budgeting.dto.AudioChatResult;
-import com.projeto.budgeting.dto.AudioMessageResponse;
+import com.projeto.budgeting.dto.ChatResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,15 +13,17 @@ import lombok.RequiredArgsConstructor;
 public class AudioChatService {
 
     private final TranscriptionService transcriptionService;
+    private final ChatService chatService;
     private final SpeechService speechService;
 
     public AudioChatResult processAudioMessage(MultipartFile audioMessage) {
-        AudioMessageResponse audioMessageResponse = transcriptionService.receiveAudio(audioMessage);
-        byte[] audio = speechService.generateAudio(audioMessageResponse.getMessage());
+        String transcription = transcriptionService.transcribe(audioMessage);
+        ChatResponse chatResponse = chatService.chamarChatClient(transcription);
+        byte[] audio = speechService.generateAudio(chatResponse.getMessage());
 
         return new AudioChatResult(
-                audioMessageResponse.getTranscription(),
-                audioMessageResponse.getMessage(),
+                transcription,
+                chatResponse.getMessage(),
                 audio);
     }
 
