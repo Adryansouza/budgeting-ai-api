@@ -1,337 +1,143 @@
-# 💰 Budgeting AI API
+# Budgeting AI API 💰
 
-![Java](https://img.shields.io/badge/Java-21-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-brightgreen)
-![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0-green)
-![MySQL](https://img.shields.io/badge/MySQL-Database-blue)
-![Python](https://img.shields.io/badge/Python-Audio-yellow)
-![Projeto educacional](https://img.shields.io/badge/projeto-educacional-lightgrey)
+![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Spring AI](https://img.shields.io/badge/Spring_AI-2.0-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-Audio-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-IA_Local-black?style=for-the-badge)
 
-## 📖 Descrição do projeto
+## Sumário
 
-API inteligente de controle financeiro desenvolvida com **Java, Spring Boot e Spring AI**, como parte do desafio de projeto da **Digital Innovation One (DIO)**, no programa realizado em parceria com o **Santander**.
+- [Sobre o projeto](#sobre-o-projeto)
+- [Fluxo principal](#fluxo-principal)
+- [Funcionalidades](#funcionalidades)
+- [Tecnologias](#tecnologias)
+- [Arquitetura](#arquitetura)
+- [Como executar](#como-executar)
+- [Endpoints](#endpoints)
+- [Testes automatizados](#testes-automatizados)
+- [Aprendizados](#aprendizados)
+- [Créditos](#créditos)
+- [Autor](#autor)
 
-A aplicação permite registrar e consultar despesas usando comandos em linguagem natural enviados por texto ou áudio. A inteligência artificial interpreta a solicitação, executa operações reais por meio de **Tool Calling** e armazena as transações em um banco de dados MySQL.
+## Sobre o projeto
 
-Na prática, a API conecta recursos de IA a funções reais da aplicação, preservando a separação de responsabilidades entre controllers, serviços, ferramentas financeiras e persistência.
+A **Budgeting AI API** é uma API inteligente de controle financeiro desenvolvida com Java, Spring Boot e Spring AI. O projeto foi criado como parte do desafio da **DIO**, no programa realizado em parceria com o **Santander**.
 
-Exemplo de uso:
+A aplicação recebe comandos financeiros em linguagem natural por texto ou áudio. A inteligência artificial interpreta a intenção da pessoa usuária, executa funções reais por meio de **Tool Calling** e registra ou consulta despesas armazenadas em um banco MySQL.
+
+Exemplo:
 
 ```text
-Gastei 25 reais hoje no mercado, adiciona nas despesas pra mim.
+Gastei 25 reais no mercado, adiciona nas despesas para mim.
 ```
 
-A aplicacao interpreta o comando, identifica que se trata de uma despesa, infere a categoria `alimentacao` e registra a transacao no banco de dados.
+A IA identifica o valor, a descrição e a categoria `alimentacao`, chama a ferramenta financeira e registra a despesa no banco de dados.
 
-## 🎯 Sobre o desafio
+> O Spring AI é utilizado no ChatClient e no Tool Calling. A transcrição e a síntese de voz são realizadas por integrações Python com Faster Whisper e Edge TTS.
 
-O objetivo principal e demonstrar como integrar recursos de Inteligencia Artificial a uma aplicacao Java real, mantendo uma arquitetura organizada e pronta para evolucao.
+## Fluxo principal
 
-O fluxo principal da API e:
+1. O cliente envia uma mensagem de texto ou um arquivo de áudio.
+2. Quando necessário, o áudio é transcrito para texto.
+3. O comando é enviado ao modelo de IA pelo Spring AI.
+4. A IA identifica a intenção financeira.
+5. Uma ferramenta da aplicação é chamada por Tool Calling.
+6. A operação registra ou consulta informações no MySQL.
+7. A resposta é devolvida em texto ou convertida em áudio.
 
-1. Receber uma mensagem de texto ou arquivo de audio.
-2. Transformar audio em texto, quando necessario.
-3. Enviar o texto para um modelo de IA usando Spring AI.
-4. Interpretar a intencao do comando financeiro.
-5. Executar uma funcao real da aplicacao usando Tool Calling.
-6. Criar ou consultar transacoes financeiras.
-7. Retornar uma resposta final para a pessoa usuaria.
+## Funcionalidades
 
-## 🚀 Minha evolução no projeto
+- Registro de despesas por linguagem natural.
+- Inferência de categorias como alimentação, saúde e transporte.
+- Consulta do total geral de despesas.
+- Consulta de gastos por categoria, mês ou intervalo de datas.
+- Soma de múltiplas categorias em um período.
+- Transcrição de arquivos de áudio.
+- Conversão de texto em áudio MP3.
+- Fluxo completo de comando financeiro por voz.
+- Persistência das transações no MySQL.
+- Validação das entradas e tratamento de erros HTTP.
+- Testes automatizados das regras financeiras.
 
-Alem da base proposta no desafio, implementei melhorias para deixar a API mais completa e mais proxima de um uso real.
-
-Principais evolucoes:
-
-- Persistencia de transacoes financeiras em banco MySQL no Railway.
-- Criacao da tabela `transacoes` com nomes em portugues.
-- Registro automatico de despesas a partir de frases naturais.
-- Inferencia simples de categorias, como `mercado` para `alimentacao` e `uber` para `transporte`.
-- Consultas de total geral de despesas.
-- Consultas de total por categoria.
-- Consultas de gastos do mes atual.
-- Consultas por periodo.
-- Soma de varias categorias no mesmo periodo.
-- Endpoints REST para texto, transcricao de audio, geracao de audio e fluxo completo de audio com IA.
-- Uso de scripts Python para transcricao e geracao de fala.
-
-> O Spring AI e usado no ChatClient e no Tool Calling. Nesta versao, a transcricao e a sintese de voz sao feitas por integracoes Python com Faster Whisper e Edge TTS, como uma evolucao propria do projeto base.
-
-## 🛠️ Tecnologias utilizadas
+## Tecnologias
 
 - Java 21
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- Spring AI
-- Ollama
-- MySQL
-- Railway
-- Maven
-- Lombok
-- Python
-- Faster Whisper
-- Insomnia para testes de API
+- Spring Boot 4.1
+- Spring Web, Spring Data JPA e Spring Validation
+- Spring AI 2.0 e Ollama
+- MySQL e Railway
+- Maven e Lombok
+- Python, Faster Whisper e Edge TTS
+- JUnit, Mockito e AssertJ
 
-## 🏗️ Arquitetura do projeto
-
-A aplicacao foi organizada em camadas para separar responsabilidades:
+## Arquitetura
 
 ```text
-controller  -> recebe as requisicoes HTTP
-dto         -> representa os dados de entrada e saida da API
-model       -> representa as entidades persistidas no banco
-repository  -> faz a comunicacao com o banco de dados
-services    -> concentra as regras de negocio
-tools       -> expoe funcoes reais para a IA usar com Tool Calling
-resources   -> contem configuracoes e prompt do assistente financeiro
-scripts     -> contem scripts auxiliares de audio e banco de dados
+src/main/java/com/projeto/budgeting
+├── controller   # Endpoints REST e tratamento de erros
+├── dto          # Objetos de entrada e saída
+├── model        # Entidades e tipos do domínio
+├── repository   # Persistência com Spring Data JPA
+├── services     # Regras de negócio e integrações
+└── tools        # Funções disponibilizadas para Tool Calling
+
+src/main/resources
+└── prompts      # Personalidade e instruções do assistente
+
+scripts
+├── transcribe.py
+├── speak.py
+└── DATABASE.sql
 ```
 
-## 🗄️ Estrutura do banco de dados
+## Como executar
 
-O banco foi estruturado com nomes em portugues para facilitar o entendimento do projeto.
+### Pré-requisitos
 
-Tabela principal: `transacoes`
+- [Java 21](https://www.oracle.com/java/technologies/downloads/#java21)
+- [Git](https://git-scm.com/)
+- [Python 3](https://www.python.org/downloads/)
+- [Ollama](https://ollama.com/)
+- MySQL local ou uma instância no Railway
 
-```sql
-CREATE TABLE IF NOT EXISTS transacoes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    descricao VARCHAR(255) NOT NULL,
-    valor DECIMAL(10, 2) NOT NULL,
-    tipo ENUM('DESPESA', 'RECEITA') NOT NULL DEFAULT 'DESPESA',
-    categoria VARCHAR(255) NOT NULL,
-    data_ocorrencia DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    data_criacao DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    PRIMARY KEY (id)
-);
-```
-
-O mesmo comando tambem esta disponivel em:
-
-```text
-scripts/DATABASE.sql
-```
-
-### Campos da Tabela
-
-| Campo | Descricao |
-| --- | --- |
-| `id` | Identificador unico da transacao |
-| `descricao` | Descricao curta da despesa ou receita |
-| `valor` | Valor financeiro da transacao |
-| `tipo` | Tipo da transacao: `DESPESA` ou `RECEITA` |
-| `categoria` | Categoria financeira, como `alimentacao`, `transporte` ou `lazer` |
-| `data_ocorrencia` | Data em que a transacao aconteceu |
-| `data_criacao` | Data em que o registro foi criado no sistema |
-
-## 🔌 Endpoints da API
-
-### 1. Conversa por Texto
-
-```http
-POST /chat
-```
-
-Envia uma mensagem de texto para o assistente financeiro.
-
-Exemplo de body:
-
-```json
-{
-  "message": "Gastei 25 reais hoje no mercado"
-}
-```
-
-Exemplo de resposta:
-
-```json
-{
-  "message": "Despesa registrada com sucesso: Mercado | Categoria: alimentacao | Valor: R$ 25"
-}
-```
-
-### 2. Transcricao de Audio
-
-```http
-POST /transcriptions
-```
-
-Recebe um arquivo de audio e retorna o texto transcrito.
-
-Tipo de body:
-
-```text
-multipart/form-data
-```
-
-Campo esperado:
-
-```text
-audioMessage
-```
-
-Exemplo de resposta:
-
-```json
-{
-  "text": "gastei 25 reais no mercado"
-}
-```
-
-Este endpoint apenas transcreve o arquivo. Ele nao envia a mensagem para a IA nem altera o banco de dados.
-
-### 3. Geracao de Audio
-
-```http
-POST /speech
-```
-
-Recebe um texto e retorna um arquivo de audio no formato MP3.
-
-Exemplo de body:
-
-```json
-{
-  "text": "Despesa registrada com sucesso"
-}
-```
-
-Resposta:
-
-```text
-audio/mpeg
-```
-
-### 4. Fluxo Completo por Audio
-
-```http
-POST /audio-chat
-```
-
-Recebe um audio, transcreve a mensagem, envia o texto para o assistente financeiro, executa a acao necessaria e retorna uma resposta em audio.
-
-Tipo de body:
-
-```text
-multipart/form-data
-```
-
-Campo esperado:
-
-```text
-audioMessage
-```
-
-Resposta:
-
-```text
-audio/mpeg
-```
-
-A resposta tambem inclui os headers:
-
-```text
-X-Transcription
-X-Assistant-Message
-```
-
-## 💬 Exemplos de comandos aceitos
-
-Registro de despesa:
-
-```text
-Gastei 80 reais na farmacia.
-Paguei 35 no uber.
-Fui no mercado e deixei 120 reais.
-Comprei uma pizza e deu 45 reais.
-```
-
-Consultas financeiras:
-
-```text
-Quanto gastei no total?
-Qual meu gasto desse mes com lazer?
-Quanto gastei com alimentacao?
-Soma lazer com alimentacao este mes.
-Quanto gastei entre 2026-08-01 e 2026-08-31?
-```
-
-## ▶️ Como executar o projeto
-
-### 1. Clonar o repositorio
+### Clonando o projeto
 
 ```bash
 git clone https://github.com/Adryansouza/budgeting-ai-api.git
 cd budgeting-ai-api
 ```
 
-### 2. Configurar o banco de dados
+### Variáveis de ambiente
 
-Crie um banco MySQL no Railway e configure as variaveis de ambiente:
-
-```text
-MYSQLHOST
-MYSQLPORT
-MYSQLDATABASE
-MYSQLUSER
-MYSQLPASSWORD
-```
-
-O arquivo de exemplo da aplicacao fica em:
+Use `src/main/resources/application-example.properties` como referência para criar `src/main/resources/application.properties`.
 
 ```text
-src/main/resources/application-example.properties
+MYSQLHOST=seu_host
+MYSQLPORT=3306
+MYSQLDATABASE=seu_banco
+MYSQLUSER=seu_usuario
+MYSQLPASSWORD=sua_senha
 ```
 
-Copie esse arquivo como `src/main/resources/application.properties`. O arquivo real fica fora do Git para evitar o vazamento de credenciais.
+O `application.properties` real não deve ser enviado ao Git, pois pode conter credenciais.
 
-### 3. Criar a tabela no Railway
+### Banco de dados
 
-Execute o SQL disponivel em:
+Execute `scripts/DATABASE.sql` no MySQL para criar a tabela `transacoes`.
 
-```text
-scripts/DATABASE.sql
-```
-
-Ou use diretamente:
-
-```sql
-CREATE TABLE IF NOT EXISTS transacoes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    descricao VARCHAR(255) NOT NULL,
-    valor DECIMAL(10, 2) NOT NULL,
-    tipo ENUM('DESPESA', 'RECEITA') NOT NULL DEFAULT 'DESPESA',
-    categoria VARCHAR(255) NOT NULL,
-    data_ocorrencia DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    data_criacao DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    PRIMARY KEY (id)
-);
-```
-
-### 4. Subir o Ollama
-
-O projeto usa o Ollama como modelo local de IA.
-
-Exemplo de modelo configurado:
-
-```text
-qwen2.5:1.5b
-```
-
-Comando para baixar o modelo:
+### Ollama
 
 ```bash
 ollama pull qwen2.5:1.5b
 ```
 
-Mantenha o Ollama em execucao enquanto estiver usando os endpoints `/chat` e `/audio-chat`.
+Mantenha o Ollama em execução para utilizar `/chat` e `/audio-chat`.
 
-### 5. Preparar o ambiente Python
+### Ambiente Python
 
-O Python e usado na transcricao e na geracao de voz.
-
-No Windows (PowerShell):
+No Windows PowerShell:
 
 ```powershell
 python -m venv .venv
@@ -339,7 +145,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Em Linux ou macOS:
+No Linux ou macOS:
 
 ```bash
 python3 -m venv .venv
@@ -348,93 +154,64 @@ python -m pip install -r requirements.txt
 export PYTHON_EXECUTABLE=.venv/bin/python
 ```
 
-Na primeira transcricao, o Faster Whisper baixa o modelo `small`. A geracao de voz com Edge TTS precisa de conexao com a internet.
+Na primeira transcrição, o Faster Whisper baixa o modelo `small`. A geração de voz com Edge TTS precisa de conexão com a internet.
 
-### 6. Executar a aplicacao
+### Iniciando a aplicação
 
 No Windows:
 
-```bash
+```powershell
 mvnw.cmd spring-boot:run
 ```
 
-Em Linux ou macOS:
+No Linux ou macOS:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-A API ficara disponivel em:
+A API estará disponível em `http://localhost:8080`.
 
-```text
-http://localhost:8080
-```
+## Endpoints
 
-## 🧪 Como testar no Insomnia
+| Método | Rota | Descrição |
+|---|---|---|
+| `POST` | `/chat` | Envia um comando textual para a IA |
+| `POST` | `/transcriptions` | Transcreve um arquivo de áudio sem alterar o banco |
+| `POST` | `/speech` | Converte um texto em arquivo MP3 |
+| `POST` | `/audio-chat` | Executa o fluxo completo por áudio |
 
-### Teste de registro por texto
+### POST `/chat`
 
-Metodo:
-
-```text
-POST
-```
-
-URL:
-
-```text
-http://localhost:8080/chat
-```
-
-Body JSON:
+REQUEST:
 
 ```json
 {
-  "message": "Gastei 25 reais hoje no mercado, adiciona nas despesas pra mim"
+  "message": "Gastei 25 reais no mercado"
 }
 ```
 
-### Teste de transcricao de audio
+RESPONSE:
 
-Metodo:
-
-```text
-POST
+```json
+{
+  "message": "Despesa registrada com sucesso: Mercado | Categoria: alimentacao | Valor: R$ 25"
+}
 ```
 
-URL:
+### POST `/transcriptions`
 
-```text
-http://localhost:8080/transcriptions
+Envie `multipart/form-data` com o arquivo no campo `audioMessage`.
+
+```json
+{
+  "text": "Gastei 25 reais no mercado"
+}
 ```
 
-Body:
+Esse endpoint somente transcreve o áudio. Ele não chama a IA nem modifica o banco.
 
-```text
-multipart/form-data
-```
-
-Campo:
-
-```text
-audioMessage
-```
-
-### Teste de texto para audio
-
-Metodo:
-
-```text
-POST
-```
-
-URL:
-
-```text
-http://localhost:8080/speech
-```
-
-Body JSON:
+### POST `/speech`
 
 ```json
 {
@@ -442,66 +219,53 @@ Body JSON:
 }
 ```
 
-### Teste do fluxo completo por audio
+A resposta possui o tipo `audio/mpeg` e contém um arquivo MP3.
 
-Crie uma requisicao `POST` para:
+### POST `/audio-chat`
+
+Envie `multipart/form-data` com o arquivo no campo `audioMessage`. O endpoint transcreve o áudio, envia o comando para a IA, executa a ferramenta financeira e devolve a resposta em MP3.
+
+Headers retornados:
 
 ```text
-http://localhost:8080/audio-chat
+X-Transcription
+X-Assistant-Message
 ```
 
-Use `multipart/form-data`, com o arquivo no campo `audioMessage`. A resposta sera um MP3 e os headers `X-Transcription` e `X-Assistant-Message` mostrarao a transcricao e a resposta da IA.
-
-### Testes automatizados
-
-No Windows:
+## Testes automatizados
 
 ```powershell
 mvnw.cmd test
 ```
 
-Em Linux ou macOS:
+Em Linux ou macOS, execute `./mvnw test`.
 
-```bash
-./mvnw test
-```
+Os testes cobrem o carregamento da aplicação, normalização das transações, consultas por período e validações das ferramentas financeiras. A integração com Ollama é opcional e pode ser habilitada com `OLLAMA_ENABLED=true`.
 
-Os testes automatizados cobrem o carregamento da aplicacao, a normalizacao das transacoes, consultas por periodo e validacoes das ferramentas financeiras. O teste de integracao com Ollama e opcional e pode ser habilitado com `OLLAMA_ENABLED=true`.
+## Aprendizados
 
-## 🎓 Aprendizados
+- Criação de APIs REST com Spring Boot.
+- Integração de modelos de IA com Spring AI e Ollama.
+- Uso do ChatClient e Tool Calling.
+- Persistência com Spring Data JPA e MySQL.
+- Processamento de áudio com Python.
+- Validação de requisições e tratamento de erros.
+- Organização de responsabilidades em camadas.
+- Criação de testes automatizados.
 
-Durante o desenvolvimento deste projeto, pratiquei conceitos importantes de desenvolvimento backend com Java e Spring Boot.
-
-Os principais aprendizados foram:
-
-- Como estruturar uma API REST com Spring Boot.
-- Como integrar uma aplicacao Java com um modelo de IA usando Spring AI.
-- Como usar ChatClient para enviar mensagens ao modelo.
-- Como expor funcoes reais da aplicacao para a IA por meio de Tool Calling.
-- Como persistir dados financeiros em MySQL usando Spring Data JPA.
-- Como conectar a aplicacao a um banco hospedado no Railway.
-- Como trabalhar com transcricao de audio e geracao de voz.
-- Como organizar responsabilidades entre controller, service, repository, model e DTO.
-- Como documentar uma API para facilitar testes e avaliacao.
-
-## ✅ Conclusão
-
-Este projeto demonstra uma aplicacao pratica de Inteligencia Artificial integrada a uma API Java. Mais do que apenas conversar com um modelo, a aplicacao executa acoes reais, registra dados financeiros, consulta informacoes persistidas e permite interacao por texto e audio.
-
-A evolucao implementada mostra como uma API simples pode se tornar um assistente financeiro inteligente, mantendo uma base organizada para futuras melhorias, como autenticacao, controle por usuario, dashboards, metas financeiras e categorias personalizadas.
-
-## 📚 Créditos
+## Créditos
 
 Projeto desenvolvido como parte do desafio da **Digital Innovation One (DIO)**, no programa realizado em parceria com o **Santander**.
 
-O projeto foi baseado nos conteúdos apresentados na trilha de Spring Boot e evoluído com implementações próprias relacionadas a consultas financeiras, persistência, validações, processamento de áudio e testes automatizados.
+O projeto foi baseado nos conteúdos da trilha de Spring Boot e evoluído com implementações próprias de persistência, consultas financeiras, validações, áudio e testes.
 
 - [Digital Innovation One](https://www.dio.me/)
-- [Repositório da trilha Spring Boot](https://github.com/digitalinnovationone/dio-spring-boot-learning-track)
+- [Trilha de Spring Boot da DIO](https://github.com/digitalinnovationone/dio-spring-boot-learning-track)
 - [Projeto de referência com Spring AI](https://github.com/digitalinnovationone/dio-spring-boot-learning-track/tree/main/05-spring-ai)
+- [Modelo de README utilizado como referência](https://github.com/Fernanda-Kipper/Readme-Templates/blob/main/badges/backend.md)
 
-## 👨‍💻 Autor
+## Autor
 
 Desenvolvido por **Adryan Albuquerque**.
 
-- [GitHub — Adryansouza](https://github.com/Adryansouza)
+[![GitHub](https://img.shields.io/badge/GitHub-Adryansouza-181717?style=for-the-badge&logo=github)](https://github.com/Adryansouza)
