@@ -23,51 +23,55 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transaction {
+public class Lancamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "descricao", nullable = false)
-    private String description;
+    private String descricao;
 
     @Column(name = "valor", nullable = false, precision = 10, scale = 2)
-    private BigDecimal amount;
+    private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 20)
-    private TransactionType type;
+    private TipoLancamento tipo;
 
     @Column(name = "categoria", nullable = false)
-    private String category;
+    private String categoria;
 
     @Column(name = "data_ocorrencia", nullable = false)
-    private LocalDateTime occurredAt;
+    private LocalDateTime dataOcorrencia;
 
     @Column(name = "data_criacao", nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime dataCriacao;
 
-    public Transaction(String description, BigDecimal amount, String category) {
-        this.description = description;
-        this.amount = amount;
-        this.category = category;
-        this.type = TransactionType.DESPESA;
-        this.occurredAt = LocalDateTime.now();
+    public Lancamento(String descricao, BigDecimal valor, String categoria) {
+        this(descricao, valor, categoria, TipoLancamento.DESPESA);
+    }
+
+    public Lancamento(String descricao, BigDecimal valor, String categoria, TipoLancamento tipo) {
+        this.descricao = descricao;
+        this.valor = valor;
+        this.categoria = categoria;
+        this.tipo = tipo;
+        this.dataOcorrencia = LocalDateTime.now();
     }
 
     @PrePersist
     void prePersist() {
-        if (type == null) {
-            type = TransactionType.DESPESA;
+        if (tipo == null) {
+            tipo = TipoLancamento.DESPESA;
         }
 
-        if (occurredAt == null) {
-            occurredAt = LocalDateTime.now();
+        if (dataOcorrencia == null) {
+            dataOcorrencia = LocalDateTime.now();
         }
 
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+        if (dataCriacao == null) {
+            dataCriacao = LocalDateTime.now();
         }
     }
 

@@ -11,21 +11,21 @@ import org.springframework.util.FileCopyUtils;
 
 import com.projeto.budgeting.dto.ChatRequest;
 import com.projeto.budgeting.dto.ChatResponse;
-import com.projeto.budgeting.tools.FinanceTools;
+import com.projeto.budgeting.tools.FerramentasFinanceiras;
 
 @Service
 public class ChatService {
 
     private final ChatClient chatClient;
-    private final FinanceTools financeTools;
+    private final FerramentasFinanceiras ferramentasFinanceiras;
     private final String systemPrompt;
 
     public ChatService(
             ChatClient.Builder chatClientBuilder,
-            FinanceTools financeTools,
+            FerramentasFinanceiras ferramentasFinanceiras,
             @Value("classpath:prompts/financial-assistant-prompt.txt") Resource promptResource) throws IOException {
         this.chatClient = chatClientBuilder.build();
-        this.financeTools = financeTools;
+        this.ferramentasFinanceiras = ferramentasFinanceiras;
         this.systemPrompt = readPrompt(promptResource);
     }
 
@@ -39,7 +39,7 @@ public class ChatService {
         String respostaDaIa = chatClient.prompt()
                 .system(systemPrompt)
                 .user(userMessage)
-                .tools(financeTools)
+                .tools(ferramentasFinanceiras)
                 .call()
                 .content();
 

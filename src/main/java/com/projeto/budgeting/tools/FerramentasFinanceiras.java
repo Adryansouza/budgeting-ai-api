@@ -9,16 +9,16 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
-import com.projeto.budgeting.model.Transaction;
-import com.projeto.budgeting.services.TransactionService;
+import com.projeto.budgeting.model.Lancamento;
+import com.projeto.budgeting.services.ServicoLancamento;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class FinanceTools {
+public class FerramentasFinanceiras {
 
-    private final TransactionService transactionService;
+    private final ServicoLancamento servicoLancamento;
 
     @Tool(description = "Registra imediatamente uma despesa financeira. Use quando o usuario informar um gasto com descricao e valor, mesmo que a categoria precise ser inferida pelo contexto, como farmacia=saude, mercado=alimentacao, uber=transporte.")
     public String registrarDespesas(
@@ -40,33 +40,61 @@ public class FinanceTools {
             return erroCategoria;
         }
 
-        Transaction transaction = transactionService.registerExpense(descricao, valor, categoria);
+        Lancamento lancamento = servicoLancamento.registrarDespesa(descricao, valor, categoria);
 
-        return "Despesa registrada com sucesso: " + transaction.getDescription()
-                + " | Categoria: " + transaction.getCategory()
-                + " | Valor: R$ " + transaction.getAmount();
+        return "Despesa registrada com sucesso: " + lancamento.getDescricao()
+                + " | Categoria: " + lancamento.getCategoria()
+                + " | Valor: R$ " + lancamento.getValor();
+    }
+
+    @Tool(description = "Registra imediatamente uma receita financeira quando o usuario informar uma entrada com descricao e valor.")
+    public String registrarReceita(
+            @ToolParam(description = "Descricao curta da receita. Exemplos: salario, freelance, venda.") String descricao,
+            @ToolParam(description = "Valor numerico da receita em reais. Exemplo: 2000.00") BigDecimal valor,
+            @ToolParam(description = "Categoria da receita. Exemplos: renda, freelance, vendas.") String categoria) {
+        
+        String erroDescricao = validarDescricao(descricao);
+        if (erroDescricao != null) {
+            return erroDescricao;
+        }
+
+        String erroValor = validarValor(valor);
+        if (erroValor != null) {
+            return erroValor;
+        }
+
+        String erroCategoria = validarCategoria(categoria);
+        if (erroCategoria != null) {
+            return erroCategoria;
+        }
+
+        Lancamento lancamento = servicoLancamento.registrarReceita(descricao, valor, categoria);
+
+        return "Receita registrada com sucesso: " + lancamento.getDescricao()
+                + " | Categoria: " + lancamento.getCategoria()
+                + " | Valor: R$ " + lancamento.getValor();
     }
 
     @Tool(description = "Lista todas as despesas registradas ate o momento.")
     public String listarDespesas() {
-        List<Transaction> transactions = transactionService.listExpenses();
+        List<Lancamento> lancamentos = servicoLancamento.listarDespesas();
 
-        if (transactions.isEmpty()) {
+        if (lancamentos.isEmpty()) {
             return "Nenhuma despesa foi registrada ate o momento.";
         }
 
         StringBuilder resposta = new StringBuilder("Despesas registradas:");
 
-        for (int i = 0; i < transactions.size(); i++) {
-            Transaction transaction = transactions.get(i);
+        for (int i = 0; i < lancamentos.size(); i++) {
+            Lancamento lancamento = lancamentos.get(i);
             resposta.append("\n")
                     .append(i + 1)
                     .append(". ")
-                    .append(transaction.getDescription())
+                    .append(lancamento.getDescricao())
                     .append(" | Categoria: ")
-                    .append(transaction.getCategory())
+                    .append(lancamento.getCategoria())
                     .append(" | Valor: R$ ")
-                    .append(transaction.getAmount());
+                    .append(lancamento.getValor());
         }
 
         return resposta.toString();
@@ -74,7 +102,7 @@ public class FinanceTools {
 
     @Tool(description = "Calcula o valor total de todas as despesas registradas.")
     public String calcularTotalDespesas() {
-        BigDecimal total = transactionService.calculateTotalExpenses();
+        BigDecimal total = servicoLancamento.calcularTotalDespesas();
 
         return "O total de despesas registradas e R$ " + total + ".";
     }
@@ -87,7 +115,7 @@ public class FinanceTools {
             return erroCategoria;
         }
 
-        BigDecimal total = transactionService.calculateTotalByCategory(categoria);
+        BigDecimal total = servicoLancamento.calcularTotalPorCategoria(categoria);
 
         if (total.compareTo(BigDecimal.ZERO) == 0) {
             return "Nao encontrei despesas registradas na categoria " + categoria.trim().toLowerCase() + ".";
@@ -98,7 +126,7 @@ public class FinanceTools {
 
     @Tool(description = "Calcula o total de despesas do mes atual.")
     public String calcularTotalDespesasMesAtual() {
-        BigDecimal total = transactionService.calculateTotalExpensesInCurrentMonth();
+        BigDecimal total = servicoLancamento.calcularTotalDespesasNoMesAtual();
 
         return "O total de despesas deste mes e R$ " + total + ".";
     }
@@ -111,7 +139,7 @@ public class FinanceTools {
             return erroCategoria;
         }
 
-        BigDecimal total = transactionService.calculateTotalByCategoryInCurrentMonth(categoria);
+        BigDecimal total = servicoLancamento.calcularTotalPorCategoriaNoMesAtual(categoria);
 
         if (total.compareTo(BigDecimal.ZERO) == 0) {
             return "Nao encontrei despesas deste mes na categoria " + categoria.trim().toLowerCase() + ".";
@@ -128,13 +156,14 @@ public class FinanceTools {
             return erroCategorias;
         }
 
-        BigDecimal total = transactionService.calculateTotalByCategoriesInCurrentMonth(categorias);
+        BigDecimal total = servicoLancamento.calcularTotalPorCategoriasNoMesAtual(categorias);
 
         if (total.compareTo(BigDecimal.ZERO) == 0) {
             return "Nao encontrei despesas deste mes nessas categorias.";
         }
 
-        return "O total de despesas deste mes nas categorias " + categorias.trim().toLowerCase() + " e R$ " + total + ".";
+        return "O total de despesas deste mes nas categorias " + categorias.trim().toLowerCase() + " e R$ " + total
+                + ".";
     }
 
     @Tool(description = "Calcula o total de despesas entre duas datas. As datas devem estar no formato ISO yyyy-MM-dd.")
@@ -146,7 +175,7 @@ public class FinanceTools {
             return dateRange.errorMessage();
         }
 
-        BigDecimal total = transactionService.calculateTotalExpensesByPeriod(dateRange.start(), dateRange.end());
+        BigDecimal total = servicoLancamento.calcularTotalDespesasPorPeriodo(dateRange.start(), dateRange.end());
 
         return "O total de despesas entre " + dataInicio + " e " + dataFim + " e R$ " + total + ".";
     }
@@ -166,7 +195,7 @@ public class FinanceTools {
             return dateRange.errorMessage();
         }
 
-        BigDecimal total = transactionService.calculateTotalByCategoryAndPeriod(
+        BigDecimal total = servicoLancamento.calcularTotalPorCategoriaEPeriodo(
                 categoria,
                 dateRange.start(),
                 dateRange.end());
@@ -182,7 +211,7 @@ public class FinanceTools {
 
     @Tool(description = "Lista as despesas do mes atual.")
     public String listarDespesasMesAtual() {
-        List<Transaction> transactions = transactionService.listExpensesInCurrentMonth();
+        List<Lancamento> transactions = servicoLancamento.listarDespesasNoMesAtual();
 
         return formatarListaDespesas(transactions, "Nenhuma despesa foi registrada neste mes.");
     }
@@ -195,7 +224,7 @@ public class FinanceTools {
             return erroCategoria;
         }
 
-        List<Transaction> transactions = transactionService.listExpensesByCategoryInCurrentMonth(categoria);
+        List<Lancamento> transactions = servicoLancamento.listarDespesasPorCategoriaNoMesAtual(categoria);
 
         return formatarListaDespesas(
                 transactions,
@@ -204,7 +233,7 @@ public class FinanceTools {
 
     private String validarDescricao(String descricao) {
         if (descricao == null || descricao.isBlank()) {
-            return "Nao consegui registrar a despesa porque a descricao nao foi informada.";
+            return "Nao consegui registrar o lancamento porque a descricao nao foi informada.";
         }
 
         return null;
@@ -212,11 +241,11 @@ public class FinanceTools {
 
     private String validarValor(BigDecimal valor) {
         if (valor == null) {
-            return "Nao consegui registrar a despesa porque o valor nao foi informado.";
+            return "Nao consegui registrar o lancamento porque o valor nao foi informado.";
         }
 
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-            return "Nao consegui registrar a despesa porque o valor precisa ser maior que zero.";
+            return "Nao consegui registrar o lancamento porque o valor precisa ser maior que zero.";
         }
 
         return null;
@@ -257,7 +286,7 @@ public class FinanceTools {
         }
     }
 
-    private String formatarListaDespesas(List<Transaction> transactions, String emptyMessage) {
+    private String formatarListaDespesas(List<Lancamento> transactions, String emptyMessage) {
         if (transactions.isEmpty()) {
             return emptyMessage;
         }
@@ -265,15 +294,15 @@ public class FinanceTools {
         StringBuilder resposta = new StringBuilder("Despesas encontradas:");
 
         for (int i = 0; i < transactions.size(); i++) {
-            Transaction transaction = transactions.get(i);
+            Lancamento transaction = transactions.get(i);
             resposta.append("\n")
                     .append(i + 1)
                     .append(". ")
-                    .append(transaction.getDescription())
+                    .append(transaction.getDescricao())
                     .append(" | Categoria: ")
-                    .append(transaction.getCategory())
+                    .append(transaction.getCategoria())
                     .append(" | Valor: R$ ")
-                    .append(transaction.getAmount());
+                    .append(transaction.getValor());
         }
 
         return resposta.toString();

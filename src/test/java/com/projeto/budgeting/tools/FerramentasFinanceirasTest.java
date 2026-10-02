@@ -11,22 +11,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.projeto.budgeting.services.TransactionService;
+import com.projeto.budgeting.services.ServicoLancamento;
 
 @ExtendWith(MockitoExtension.class)
-class FinanceToolsTest {
+class FerramentasFinanceirasTest {
 
     @Mock
-    private TransactionService transactionService;
+    private ServicoLancamento servicoLancamento;
 
     @Test
     void naoDeveRegistrarValorNegativo() {
-        FinanceTools tools = new FinanceTools(transactionService);
+        FerramentasFinanceiras tools = new FerramentasFinanceiras(servicoLancamento);
 
         String response = tools.registrarDespesas("Mercado", new BigDecimal("-10"), "alimentacao");
 
         assertThat(response).contains("maior que zero");
-        verify(transactionService, never()).registerExpense(
+        verify(servicoLancamento, never()).registrarDespesa(
                 org.mockito.ArgumentMatchers.anyString(),
                 org.mockito.ArgumentMatchers.any(),
                 org.mockito.ArgumentMatchers.anyString());
@@ -34,7 +34,7 @@ class FinanceToolsTest {
 
     @Test
     void deveRejeitarIntervaloInvertido() {
-        FinanceTools tools = new FinanceTools(transactionService);
+        FerramentasFinanceiras tools = new FerramentasFinanceiras(servicoLancamento);
 
         String response = tools.calcularTotalPorPeriodo("2026-08-31", "2026-08-01");
 
