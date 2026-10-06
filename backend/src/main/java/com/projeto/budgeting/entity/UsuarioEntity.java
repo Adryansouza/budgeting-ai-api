@@ -28,6 +28,10 @@ public class UsuarioEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Novo campo para exibir o nome do usuário na tela de Perfil!
+    @Column(name = "nome", nullable = false, length = 100)
+    private String nome;
+
     @Column(name = "email", nullable = false, unique = true, length = 254)
     private String email;
 
