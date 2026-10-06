@@ -1,5 +1,3 @@
-//AQUI SERIA BASICAMENTE UM MODEL
-
 export type Transaction = {
   id: string;
   title: string;

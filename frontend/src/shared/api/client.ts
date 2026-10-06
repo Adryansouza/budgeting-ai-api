@@ -1,4 +1,7 @@
-import type { Transaction } from './finance';
+// Responsável por conversar com o backend.
+
+import type { Transaction } from '../domain/finance';
+import type { UsuarioLogado } from '../domain/User';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.trim().replace(/\/+$/, '');
 const READ_TIMEOUT_MS = 15_000;
@@ -112,4 +115,8 @@ export function sendChatMessage(message: string): Promise<ChatResult> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message }),
   }, CHAT_TIMEOUT_MS);
+}
+
+export async function getPerfilUsuario(): Promise<UsuarioLogado> {
+  return await request<UsuarioLogado>('/usuario/perfil');
 }
