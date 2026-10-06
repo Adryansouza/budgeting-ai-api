@@ -11,8 +11,8 @@ src/main/resources/application.properties
 
 ### Environment / secrets ###
 .env
-.env.*
-!.env.example
+node_modules/
+frontend/dist/
 
 ### Logs ###
 *.log
