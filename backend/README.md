@@ -125,7 +125,9 @@ O `application.properties` real não deve ser enviado ao Git, pois pode conter c
 
 ### Banco de dados
 
-Execute `scripts/DATABASE.sql` no MySQL para criar a tabela `transacoes`.
+Para um banco novo, execute `scripts/DATABASE.sql`. Para um banco que já tem as tabelas antigas, faça backup e execute uma única vez `scripts/MIGRATION_USUARIOS.sql`; a migração preserva os registros e adiciona `usuario_id` anulável em `contas` e `transacoes`.
+
+O relacionamento inicial é `usuarios (1) -> (N) contas` e `usuarios (1) -> (N) transacoes`. A senha permanece anulável até a autenticação ser implementada. Os registros existentes não são associados automaticamente a um usuário; os `usuario_id` podem ser preenchidos depois. Não armazene senhas em texto puro quando a autenticação for adicionada.
 
 ### Ollama
 
