@@ -20,6 +20,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Permita que o Fluxo acesse seu microfone para registrar lançamentos por voz."
+        }
+      ]
+    ]
   }
 }

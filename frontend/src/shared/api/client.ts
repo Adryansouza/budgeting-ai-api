@@ -1,11 +1,14 @@
 // Responsável por conversar com o backend.
 
+import { Platform } from 'react-native';
+import { File } from 'expo-file-system';
 import type { Transaction } from '../domain/finance';
 import type { UsuarioLogado } from '../domain/User';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.trim().replace(/\/+$/, '');
 const READ_TIMEOUT_MS = 15_000;
 const CHAT_TIMEOUT_MS = 120_000;
+const TRANSCRIPTION_TIMEOUT_MS = 120_000;
 
 type ApiErrorBody = { message?: string };
 
@@ -25,6 +28,7 @@ export type FinancialSummary = {
 };
 
 export type ChatResult = { message: string };
+type TranscriptionResult = { text: string };
 const categoryLabels: Record<string, string> = {
   alimentacao: 'Alimentação',
   transporte: 'Transporte',
@@ -115,6 +119,22 @@ export function sendChatMessage(message: string): Promise<ChatResult> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message }),
   }, CHAT_TIMEOUT_MS);
+}
+
+export async function transcribeAudio(uri: string): Promise<TranscriptionResult> {
+  const formData = new FormData();
+
+  if (Platform.OS === 'web') {
+    const audioBlob = await (await fetch(uri)).blob();
+    formData.append('audioMessage', audioBlob, 'gravacao.webm');
+  } else {
+    formData.append('audioMessage', new File(uri));
+  }
+
+  return await request<TranscriptionResult>('/transcriptions', {
+    method: 'POST',
+    body: formData,
+  }, TRANSCRIPTION_TIMEOUT_MS);
 }
 
 export async function getPerfilUsuario(): Promise<UsuarioLogado> {

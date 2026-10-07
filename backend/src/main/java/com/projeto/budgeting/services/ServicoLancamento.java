@@ -23,17 +23,31 @@ public class ServicoLancamento {
     private final RepositorioLancamento repositorioLancamento;
 
     public Lancamento registrarDespesa(String descricao, BigDecimal valor, String categoria) {
+        return registrarDespesa(descricao, valor, categoria, null);
+    }
+
+    public Lancamento registrarDespesa(String descricao, BigDecimal valor, String categoria, LocalDate dataOcorrencia) {
         Lancamento lancamento = new Lancamento(descricao.trim(), valor, normalizarCategoria(categoria));
+        if (dataOcorrencia != null) {
+            lancamento.setDataOcorrencia(dataOcorrencia.atTime(LocalDateTime.now().toLocalTime()));
+        }
 
         return repositorioLancamento.save(lancamento);
     }
 
     public Lancamento registrarReceita(String descricao, BigDecimal valor, String categoria) {
+        return registrarReceita(descricao, valor, categoria, null);
+    }
+
+    public Lancamento registrarReceita(String descricao, BigDecimal valor, String categoria, LocalDate dataOcorrencia) {
         Lancamento lancamento = new Lancamento(
                 descricao.trim(),
                 valor,
                 normalizarCategoria(categoria),
                 TipoLancamento.RECEITA);
+        if (dataOcorrencia != null) {
+            lancamento.setDataOcorrencia(dataOcorrencia.atTime(LocalDateTime.now().toLocalTime()));
+        }
 
         return repositorioLancamento.save(lancamento);
     }
