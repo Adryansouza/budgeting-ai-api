@@ -14,7 +14,7 @@ def main():
         print(f"Arquivo de audio nao encontrado: {audio_path}", file=sys.stderr)
         sys.exit(1)
 
-    model_name = "small"
+    model_name = "base"
     model = WhisperModel(model_name, device="cpu", compute_type="int8")
     segments, _ = model.transcribe(str(audio_path), language="pt")
 

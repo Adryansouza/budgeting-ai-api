@@ -2,11 +2,12 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurTargetView } from 'expo-blur';
+import { AudioModule, RecordingPresets, setAudioModeAsync, useAudioRecorder } from 'expo-audio';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { cancelAnimation, clamp, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { SafeAreaView, View, useWindowDimensions } from 'react-native';
-import { getFinancialSummary, getTransactions, sendChatMessage, type FinancialSummary } from '../shared/api/client';
+import { getFinancialSummary, getTransactions, sendChatMessage, transcribeAudio, type FinancialSummary } from '../shared/api/client';
 import { categoryNames, formatCurrency, type Transaction } from '../shared/domain/finance';
 import { pageSpring, pageTabs, type PageTab } from '../shared/domain/navigation';
 import { styles } from '../shared/theme/styles';
@@ -35,6 +36,8 @@ export default function App() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
   const visibleTransactions = useMemo(() => items.slice(0, tab === 'Início' ? 3 : items.length), [items, tab]);
   const categoryTotals = useMemo(() => {
@@ -131,6 +134,57 @@ export default function App() {
     } finally { setSaving(false); }
   }
 
+  async function startRecording(): Promise<void> {
+    setApiError(null);
+    try {
+      const permission = await AudioModule.requestRecordingPermissionsAsync();
+      if (!permission.granted) {
+        throw new Error('Permita o uso do microfone para registrar um lançamento por voz.');
+      }
+
+      await setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true });
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
+      setSheet('recording');
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : 'Não foi possível iniciar a gravação.');
+    }
+  }
+
+  async function stopAndTranscribeRecording(): Promise<void> {
+    if (!audioRecorder.isRecording) return;
+
+    setTranscribing(true);
+    setApiError(null);
+    try {
+      await audioRecorder.stop();
+      if (!audioRecorder.uri) {
+        throw new Error('Não foi possível encontrar o áudio gravado.');
+      }
+
+      const result = await transcribeAudio(audioRecorder.uri);
+      setEntry(result.text);
+      setSheet('entry');
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : 'Não foi possível transcrever o áudio.');
+      setSheet('entry');
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
+  async function closeEntryModal(): Promise<void> {
+    if (audioRecorder.isRecording) {
+      try {
+        await audioRecorder.stop();
+      } catch {
+        // A gravação pode já ter sido interrompida pelo sistema.
+      }
+    }
+    setTranscribing(false);
+    setSheet('closed');
+  }
+
   if (!signedIn) return <GestureHandlerRootView style={styles.gestureRoot}><SafeAreaView style={styles.safe}><StatusBar style="light" /><AuthFlow onComplete={() => setSignedIn(true)} /></SafeAreaView></GestureHandlerRootView>;
 
   return <GestureHandlerRootView style={styles.gestureRoot}><SafeAreaView style={styles.safe}><StatusBar style="light" /><View style={styles.app}>
@@ -148,6 +202,6 @@ export default function App() {
       </View></GestureDetector>
     </BlurTargetView>
     <BottomNav active={tab} blurTarget={blurTarget} progress={pageProgress} indicatorStretch={indicatorStretch} onChange={(next) => next === 'Registrar' ? setSheet('entry') : navigateTo(next)} />
-    <EntryModal state={sheet} entry={entry} onChange={(value) => { setEntry(value); setApiError(null); }} onClose={() => setSheet('closed')} onRecord={() => setSheet('recording')} onStop={() => setSheet('entry')} onSave={saveEntry} onHistory={() => { setSheet('closed'); navigateTo('Histórico'); }} error={sheet === 'entry' ? apiError : null} saving={saving} successMessage={successMessage} />
+    <EntryModal state={sheet} entry={entry} onChange={(value) => { setEntry(value); setApiError(null); }} onClose={() => { void closeEntryModal(); }} onRecord={() => { void startRecording(); }} onStop={() => { void stopAndTranscribeRecording(); }} onSave={saveEntry} onHistory={() => { setSheet('closed'); navigateTo('Histórico'); }} error={sheet === 'entry' ? apiError : null} saving={saving} transcribing={transcribing} successMessage={successMessage} />
   </View></SafeAreaView></GestureHandlerRootView>;
 }

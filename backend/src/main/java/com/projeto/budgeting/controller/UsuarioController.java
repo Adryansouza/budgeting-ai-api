@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.budgeting.dto.UsuarioResponse;
 import com.projeto.budgeting.services.UsuarioService;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 
 @RestController
 @RequestMapping("/usuario")
+@CrossOrigin(origins = "*")
 public class UsuarioController {
     private final UsuarioService usuarioService;
 

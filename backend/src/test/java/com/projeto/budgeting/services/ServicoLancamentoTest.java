@@ -49,6 +49,18 @@ class ServicoLancamentoTest {
     }
 
     @Test
+    void deveUsarDataInformadaAoRegistrarDespesa() {
+        ServicoLancamento service = new ServicoLancamento(repository);
+        when(repository.save(org.mockito.ArgumentMatchers.any(Lancamento.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        LocalDate ontem = LocalDate.now().minusDays(1);
+
+        Lancamento salvo = service.registrarDespesa("Pizzaria", new BigDecimal("77.00"), "alimentacao", ontem);
+
+        assertThat(salvo.getDataOcorrencia().toLocalDate()).isEqualTo(ontem);
+    }
+
+    @Test
     void deveConsultarPeriodoIncluindoTodoODiaFinal() {
         ServicoLancamento service = new ServicoLancamento(repository);
         LocalDate start = LocalDate.of(2026, 8, 1);

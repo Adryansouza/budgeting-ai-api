@@ -14,10 +14,10 @@ export type SheetState = 'closed' | 'entry' | 'recording' | 'success';
 type EntryModalProps = {
   state: SheetState; entry: string; onChange: (value: string) => void; onClose: () => void;
   onRecord: () => void; onStop: () => void; onSave: () => void; onHistory: () => void;
-  error: string | null; saving: boolean; successMessage: string;
+  error: string | null; saving: boolean; transcribing: boolean; successMessage: string;
 };
 
-export function EntryModal({ state, entry, onChange, onClose, onRecord, onStop, onSave, onHistory, error, saving, successMessage }: EntryModalProps) {
+export function EntryModal({ state, entry, onChange, onClose, onRecord, onStop, onSave, onHistory, error, saving, transcribing, successMessage }: EntryModalProps) {
   const sheetDragY = useSharedValue(0);
   const sheetDragStyle = useAnimatedStyle(() => ({ transform: [{ translateY: sheetDragY.value }] }));
   useEffect(() => { sheetDragY.value = 0; }, [sheetDragY, state]);
@@ -56,12 +56,12 @@ export function EntryModal({ state, entry, onChange, onClose, onRecord, onStop, 
               <LinearGradient pointerEvents="none" colors={['#2C3A25', '#172014']} style={styles.sheetGradient} />
               <View style={styles.sheetHandleArea}><View style={styles.sheetHandle} /></View>
               {state === 'recording' ? <View style={styles.recording}>
-                <View style={styles.sheetHeader}><Text style={styles.sheetTitle}>Ouvindo...</Text><CloseButton onClose={onClose} /></View>
+                <View style={styles.sheetHeader}><Text style={styles.sheetTitle}>{transcribing ? 'Transcrevendo...' : 'Ouvindo...'}</Text><CloseButton onClose={onClose} /></View>
                 <View style={styles.wave}>{[20, 36, 50, 30, 43, 24, 46].map((height, index) => <View key={index} style={[styles.waveBar, { height }]} />)}</View>
-                <Text style={styles.recordingText}>Pode falar naturalmente.</Text>
+                <Text style={styles.recordingText}>{transcribing ? 'Convertendo sua fala em texto.' : 'Pode falar naturalmente.'}</Text>
                 <View style={[styles.sheetActions, { width: '100%' }]}>
-                  <Pressable style={styles.secondaryButton} onPress={onClose}><Text style={styles.secondaryText}>Cancelar</Text></Pressable>
-                  <Pressable style={[styles.primaryButton, { backgroundColor: colors.expense }]} onPress={onStop}><Icon name="stop" size={15} /><Text style={styles.primaryText}>Parar</Text></Pressable>
+                  <Pressable disabled={transcribing} style={[styles.secondaryButton, transcribing && { opacity: 0.55 }]} onPress={onClose}><Text style={styles.secondaryText}>Cancelar</Text></Pressable>
+                  <Pressable disabled={transcribing} style={[styles.primaryButton, { backgroundColor: colors.expense }, transcribing && { opacity: 0.7 }]} onPress={onStop}><Icon name="stop" size={15} /><Text style={styles.primaryText}>{transcribing ? 'Enviando...' : 'Parar'}</Text></Pressable>
                 </View>
               </View> : <>
                 <View style={styles.sheetHeader}><Text style={styles.sheetTitle}>Registrar agora</Text><CloseButton onClose={onClose} /></View>
